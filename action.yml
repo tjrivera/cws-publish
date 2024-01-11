@@ -11,13 +11,16 @@ inputs:
     default: 'upload'
   client_id:
     description: 'Webstore API client id parameter'
-    required: true
+    required: false
   client_secret:
     description: 'Webstore API client secret parameter'
-    required: true
+    required: false
   refresh_token:
     description: 'Webstore API refresh token'
-    required: true
+    required: false
+  access_token:
+    description: 'Webstore API access token'
+    required: false
   zip_file:
     description: 'Path to extension .zip file'
     required: true
