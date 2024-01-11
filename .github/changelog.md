@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/MobileFirstLLC/cws-publish/compare/2.2.0...2.3.0) (2024-01-11)
+
+
+### Bug Fixes
+
+* make other creds optional ([476c50d](https://github.com/MobileFirstLLC/cws-publish/commit/476c50dcd03288b1f4ccc0d854f7697a8e2ce884))
+
 ## [2.2.0](https://github.com/MobileFirstLLC/cws-publish/compare/2.1.2...2.2.0) (2024-01-11)
 
 ### [2.1.1](https://github.com/MobileFirstLLC/cws-publish/compare/2.1.0...2.1.1) (2022-10-25)

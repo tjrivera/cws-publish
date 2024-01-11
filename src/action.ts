@@ -10,9 +10,9 @@ import * as core from '@actions/core'
 import { upload, publish } from './cws'
 
 const action = (core.getInput('action', { required: true }) || '').toLowerCase()
-const clientId = core.getInput('client_id', { required: true })
-const secret = core.getInput('client_secret', { required: true })
-const token = core.getInput('refresh_token', { required: true })
+const clientId = core.getInput('client_id', { required: false })
+const secret = core.getInput('client_secret', { required: false })
+const token = core.getInput('refresh_token', { required: false })
 const access_token = core.getInput('access_token', { required: false })
 const zip = core.getInput('zip_file', { required: true })
 const extId = core.getInput('extension_id', { required: true })
