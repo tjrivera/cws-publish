@@ -13,22 +13,23 @@ const action = (core.getInput('action', { required: true }) || '').toLowerCase()
 const clientId = core.getInput('client_id', { required: true })
 const secret = core.getInput('client_secret', { required: true })
 const token = core.getInput('refresh_token', { required: true })
+const access_token = core.getInput('access_token', { required: false })
 const zip = core.getInput('zip_file', { required: true })
 const extId = core.getInput('extension_id', { required: true })
 
 switch (action) {
   case 'upload':
-    upload(clientId, secret, token, zip, extId)
+    upload(clientId, secret, token, access_token, zip, extId)
       .then(_ => core.info('Upload to webstore completed'))
       .catch(error => core.setFailed(error.message))
     break
   case 'publish':
-    publish(clientId, secret, token, zip, extId, false)
+    publish(clientId, secret, token, access_token, zip, extId, false)
       .then(_ => core.info('Publish to webstore completed'))
       .catch(error => core.setFailed(error.message))
     break
   case 'testers':
-    publish(clientId, secret, token, zip, extId, true)
+    publish(clientId, secret, token, access_token, zip, extId, true)
       .then(_ => core.info('Publish webstore testers completed'))
       .catch(error => core.setFailed(error.message))
     break

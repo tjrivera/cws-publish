@@ -119,6 +119,7 @@ const handleResult = (success: boolean, result: string | APIResult) => {
  * @param {string} apiClientId - google api client id
  * @param {string} apiSecret - google api secret
  * @param {string} apiToken - google api refresh token
+ * @param {string} apiAccessToken - google api access token
  * @param {string} zipPath - path to extension zip file
  * @param {string} extensionId - extension id
  * @returns {Promise<string|undefined>} - access token if successful, and undefined otherwise
@@ -127,15 +128,21 @@ export const upload = async (
   apiClientId: string,
   apiSecret: string,
   apiToken: string,
+  apiAccessToken: string,
   zipPath: string,
   extensionId: string
 ) => {
+  let accessToken;
   // read file
   const blob = getFileBlob(zipPath)
   if (!blob) return handleResult(false, dictionary.zipError)
 
-  // obtain access token
-  const accessToken = (await getAccessToken(apiToken, apiClientId, apiSecret)) as string
+  // if access token is provided, use it, otherwise retrieve it
+  if (!apiAccessToken) {
+    accessToken = await getAccessToken(apiToken, apiClientId, apiSecret) as string
+  } else {
+    accessToken = apiAccessToken
+  }
   if (!accessToken) return handleResult(false, dictionary.authError)
 
   // upload to store
@@ -151,6 +158,7 @@ export const upload = async (
  * @param {string} apiClientId - google api client id
  * @param {string} apiSecret - google api secret
  * @param {string} apiToken - google api refresh token
+ * @param {string} apiAccessToken - google api access token
  * @param {string} zipPath - path to extension zip file
  * @param {string} extensionId - extension id
  * @param {boolean} testers - publish to testers
@@ -160,13 +168,13 @@ export const publish = async (
   apiClientId: string,
   apiSecret: string,
   apiToken: string,
+  apiAccessToken: string,
   zipPath: string,
   extensionId: string,
   testers: boolean
 ) => {
   // upload zip file
-  const accessToken = await upload(apiClientId, apiSecret, apiToken, zipPath, extensionId)
-
+  const accessToken = await upload(apiClientId, apiSecret, apiToken, apiAccessToken, zipPath, extensionId)
   // if upload succeeds, proceed to publish
   if (accessToken) {
     const [error, result] = (await publishExtension(extensionId, accessToken, testers)) as [boolean, PublishResult]
