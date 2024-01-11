@@ -13,6 +13,7 @@ const OAuth2 = require('google-auth-library').OAuth2Client
 const apiClient = 'myClientId'
 const apiSecret = 'myAPISecret'
 const apiToken = 'xyz'
+const apiAccessToken = 'xyz'
 const access_token = 'some_token'
 const badZip = 'bad.zip'
 const goodZip = 'good.zip'
@@ -79,25 +80,33 @@ describe('Chrome Web Store (CWS) Publish', function () {
     describe('\n\tLocal machine behaviors', function () {
 
         it('Missing arguments -> end with failure', async function () {
-            await upload(undefined, undefined, undefined, undefined, undefined)
+            await upload(undefined, undefined, undefined, undefined, undefined, undefined)
             terminatesWithError() // immediate failure
         })
 
         it('Empty file read fails -> end with failure', async function () {
-            await upload(apiClient, apiSecret, apiToken, badZip, extensionId)
+            await upload(apiClient, apiSecret, apiToken, undefined, badZip, extensionId)
             calledZipFileRead()
             terminatesWithError()
         })
 
         it('File read error is handled -> end with failure', async function () {
-            await upload(apiClient, apiSecret, apiToken, zipThatThrowsError, extensionId)
+            await upload(apiClient, apiSecret, apiToken, undefined, zipThatThrowsError, extensionId)
             calledZipFileRead()
             terminatesWithError()
         })
 
         it('If auth token not obtained -> end with failure', async function () {
             global.authToken.yields(true, undefined)
-            await publish(apiClient, apiSecret, apiToken, goodZip, extensionId, false)
+            await publish(
+              apiClient,
+              apiSecret,
+              apiToken,
+              undefined,
+              goodZip,
+              extensionId,
+              false
+            );
             calledZipFileRead()
             terminatesWithError()
         })
@@ -107,7 +116,7 @@ describe('Chrome Web Store (CWS) Publish', function () {
 
         it('Failed upload -> end with failure', async function () {
             global.uploadReq.returns(ApiServer(ApiResponses.upload.failure))
-            const token = await upload(apiClient, apiSecret, apiToken, goodZip, extensionId)
+            const token = await upload(apiClient, apiSecret, apiToken, undefined, goodZip, extensionId)
             expect(global.uploadReq.calledOnce, 'calls upload').to.equal(true)
             expect((console.log as any).notCalled, 'log output not expected').to.equal(true)
             expect(token, 'no token expected').to.be.undefined
@@ -117,7 +126,15 @@ describe('Chrome Web Store (CWS) Publish', function () {
         it('Success upload -> failed publish -> end with failure', async function () {
             global.uploadReq.returns(ApiServer(ApiResponses.upload.success))
             global.publishReq.returns(ApiServer(ApiResponses.publish.taken_down))
-            await publish(apiClient, apiSecret, apiToken, goodZip, extensionId, false)
+            await publish(
+              apiClient,
+              apiSecret,
+              apiToken,
+              undefined,
+              goodZip,
+              extensionId,
+              false
+            );
             expect(global.uploadReq.calledOnce, 'calls upload').to.equal(true)
             expect((console.log as any).calledOnce, 'log output expected once').to.equal(true)
             expect(global.publishReq.calledOnce, 'calls publish').to.equal(true)
@@ -134,32 +151,46 @@ describe('Chrome Web Store (CWS) Publish', function () {
 
         it('Expected access token', async function () {
             global.uploadReq.returns(ApiServer(ApiResponses.upload.success))
-            const token = await upload(apiClient, apiSecret, apiToken, goodZip, extensionId)
+            const token = await upload(apiClient, apiSecret, apiToken, undefined, goodZip, extensionId)
             expect(token, 'returns expected access_token').to.equal(access_token)
             endsWithSuccess()
         })
 
         it('Status "In progress" counts as success', async function () {
             global.uploadReq.returns(ApiServer(ApiResponses.upload.progress))
-            await upload(apiClient, apiSecret, apiToken, goodZip, extensionId)
+            await upload(apiClient, apiSecret, apiToken, undefined, goodZip, extensionId)
             endsWithSuccess()
         })
 
         it('Successful upload', async function () {
-            await upload(apiClient, apiSecret, apiToken, goodZip, extensionId)
+            await upload(apiClient, apiSecret, apiToken, undefined, goodZip, extensionId)
             calledZipFileRead()
             endsWithSuccess()
         })
 
         it('Immediate publish', async function () {
-            await publish(apiClient, apiSecret, apiToken, goodZip, extensionId, false)
+            await publish(apiClient, apiSecret, apiToken, undefined, goodZip, extensionId, false)
+            calledZipFileRead()
+            endsWithSuccess(2)
+        })
+        
+        it('Immediate publish with access token', async function () {
+            await publish(undefined, undefined, undefined, apiAccessToken, goodZip, extensionId, false)
             calledZipFileRead()
             endsWithSuccess(2)
         })
 
         it('Publish that requires review', async function () {
             global.publishReq.returns(ApiServer(ApiResponses.publish.review))
-            await publish(apiClient, apiSecret, apiToken, goodZip, extensionId, false)
+            await publish(
+              apiClient,
+              apiSecret,
+              apiToken,
+              undefined,
+              goodZip,
+              extensionId,
+              false
+            );
             expect(global.publishReq().q.publishTarget, 'publishes to default')
                 .to.equal('default')
             calledZipFileRead()
@@ -167,7 +198,15 @@ describe('Chrome Web Store (CWS) Publish', function () {
         })
 
         it('Publish to testers', async function () {
-            await publish(apiClient, apiSecret, apiToken, goodZip, extensionId, true)
+            await publish(
+              apiClient,
+              apiSecret,
+              apiToken,
+              undefined,
+              goodZip,
+              extensionId,
+              true
+            );
             expect(global.publishReq().q.publishTarget, 'publishes to testers')
                 .to.equal('trustedTesters')
             calledZipFileRead()
