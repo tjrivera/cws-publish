@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
+* make other creds optional ([419eef7](https://github.com/MobileFirstLLC/cws-publish/commit/419eef7af33caa23f20ef83c8335d1e8797e84b1))
+
+## [2.3.0](https://github.com/MobileFirstLLC/cws-publish/compare/2.2.0...2.3.0) (2024-01-11)
+
+
+### Bug Fixes
+
 * make other creds optional ([476c50d](https://github.com/MobileFirstLLC/cws-publish/commit/476c50dcd03288b1f4ccc0d854f7697a8e2ce884))
 
 ## [2.2.0](https://github.com/MobileFirstLLC/cws-publish/compare/2.1.2...2.2.0) (2024-01-11)
